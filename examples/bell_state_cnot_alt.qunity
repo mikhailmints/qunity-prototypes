@@ -1,0 +1,4 @@
+($plus, $0) |> lambda (x, y) -> ctrl x [
+    $0 -> (x, y);
+    $1 -> (x, @not(y))
+]

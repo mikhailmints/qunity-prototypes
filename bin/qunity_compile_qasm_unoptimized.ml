@@ -96,10 +96,10 @@ let rec gate_to_qasm_str (u : gate) (err_num : int) : string * int =
           ( Printf.sprintf "%s%s;\n" s (List.fold_left arglist_fold "" l),
             err_num )
 
-let gate_to_qasm_file (u : gate) (nqubits : int) (out_reg : int list) : string
-    =
+let gate_to_qasm_file (u : gate) (nqubits : int) (out_reg : int list)
+    (flag_reg : int list) : string =
   let n_out = List.length out_reg in
-  let n_flag = gate_num_err_measurements u in
+  let n_flag = List.length flag_reg in
   let header =
     Printf.sprintf
       "OPENQASM 3.0;\n\
@@ -115,6 +115,10 @@ let gate_to_qasm_file (u : gate) (nqubits : int) (out_reg : int list) : string
       (List.map
          (fun (i, j) -> Printf.sprintf "out[%d] = measure q[%d];\n" i j)
          (List.combine (range n_out) out_reg))
+    ^ List.fold_left ( ^ ) ""
+        (List.map
+           (fun (i, j) -> Printf.sprintf "err[%d] = measure q[%d];\n" i j)
+           (List.combine (range n_flag) flag_reg))
   in
     header ^ body ^ footer
 
@@ -133,9 +137,9 @@ let compile_file (prog_filename : string) (out_filename : string) : unit =
             exit 1
         | SomeE _ -> begin
             Printf.printf "Compiling to QASM\n%!";
-            let gate, nqubits, out_reg, _ = expr_compile false e in
+            let gate, nqubits, out_reg, flag_reg = expr_compile false e in
               Printf.printf "Outputting to file\n%!";
-              let qasm_str = gate_to_qasm_file gate nqubits out_reg in
+              let qasm_str = gate_to_qasm_file gate nqubits out_reg flag_reg in
               let out_file = open_out out_filename in
                 Printf.fprintf out_file "%s" qasm_str;
                 close_out out_file
