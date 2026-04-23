@@ -16,9 +16,9 @@ let get_lexing_position lexbuf =
     (line_number, column)
 
 let get_parse_error env =
-  match I.stack env with
-  | (lazy Nil) -> "Invalid syntax"
-  | (lazy (Cons (I.Element (state, _, _, _), _))) -> (
+  match I.top env with
+  | None -> "Invalid syntax"
+  | Some (I.Element (state, _, _, _)) -> (
       try
         let message = Parser_messages.message (I.number state) in
           if message = "<YOUR SYNTAX ERROR MESSAGE HERE>\n" then
@@ -72,10 +72,9 @@ let parse_with_err parse_fun s : 'a optionE =
   | Syntax_error (loc, err) -> begin
       let s =
         Printf.sprintf "Syntax error: %s\n%s" err
-          begin
-            match loc with
-            | Some (line, pos) -> Printf.sprintf "At line %d, col %d" line pos
-            | _ -> ""
+          begin match loc with
+          | Some (line, pos) -> Printf.sprintf "At line %d, col %d" line pos
+          | _ -> ""
           end
       in
         NoneE s
@@ -88,8 +87,8 @@ let get_expr_from_file (prog_filename : string) :
   let stdlib_filename = "qunitylib/stdlib.qunity" in
     match parse_with_err parse_file_qunitylib stdlib_filename with
     | NoneE err -> NoneE (err ^ "\nin " ^ stdlib_filename)
-    | SomeE stdlib_dm -> begin
-        match parse_with_err parse_file_qunityfile prog_filename with
+    | SomeE stdlib_dm ->
+        begin match parse_with_err parse_file_qunityfile prog_filename with
         | NoneE err -> NoneE (err ^ "\nin " ^ prog_filename)
         | SomeE (dm, xe) -> begin
             let dm = combine_defmaps stdlib_dm dm in
@@ -98,4 +97,4 @@ let get_expr_from_file (prog_filename : string) :
               | NoneE err ->
                   NoneE (Printf.sprintf "Preprocessing error: %s" err)
           end
-      end
+        end
