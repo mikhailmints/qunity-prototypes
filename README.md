@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the artifact for the paper "Compositional Quantum Control Flow with Efficient Compilation in Qunity". This artifact contains the code for the Qunity compiler and interpreter, as well as examples of Qunity code and scripts to run tests and benchmarks. This artifact supports the following claims made in the paper:
+This is the artifact for the paper ["Compositional Quantum Control Flow with Efficient Compilation in Qunity"](https://doi.org/10.1145/3763056). This artifact contains the code for the Qunity compiler and interpreter, as well as examples of Qunity code and scripts to run tests and benchmarks. This artifact supports the following claims made in the paper:
 
 - We created the first working implementation of a Qunity compiler while introducing new control flow constructs and a metaprogramming layer.
 - We used differential unit testing to verify the correctness of the circuits output by the compiler.
